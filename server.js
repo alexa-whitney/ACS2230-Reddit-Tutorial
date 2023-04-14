@@ -1,4 +1,5 @@
 // Setup Libraries
+const Post = require('./data/reddit-db');
 const express = require('express');
 const handlebars = require('express-handlebars');
 
@@ -19,12 +20,4 @@ app.use(express.urlencoded({ extended: false }));
 // Require controllers
 require('./controllers/posts')(app)
 
-app.get('/', (req, res) => {
-    res.render('home');
-});
-
-app.get('/posts/new', (req, res) => {
-    res.render('posts-new');
-});
-
-app.listen(3000);
+app.listen(4000);
