@@ -3,13 +3,14 @@ const Post = require('../models/post');
 module.exports = (app) => {
 
   // INDEX
-  app.get('/', (req, res) => {
-    Post.find({}).lean()
-      .then((posts) => res.render('posts-index', { posts }))
-      .catch((err) => {
-        console.log(err.message);
-      })
-  })
+  app.get('/', async (req, res) => {
+    try {
+      const posts = await Post.find({}).lean();
+      return res.render('posts-index', { posts });
+    } catch (err) {
+      console.log(err.message);
+    }
+  });
 
   // NEW
   app.get('/posts/new', (req, res) => {
@@ -27,5 +28,14 @@ module.exports = (app) => {
         res.redirect('/')
       })
       .catch(err => console.log(err))
+  });
+
+  // SHOW
+  app.get('/posts/:id', (req, res) => {
+    Post.findById(req.params.id).lean()
+      .then((post) => res.render('posts-show', { post }))
+      .catch((err) => {
+        console.log(err.message);
+      });
   });
 };
