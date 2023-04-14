@@ -3,6 +3,7 @@ const Post = require('../models/post');
 module.exports = (app) => {
 
   // INDEX
+  // Stretch Challenge - Async and Await
   app.get('/', async (req, res) => {
     try {
       const posts = await Post.find({}).lean();
@@ -18,24 +19,25 @@ module.exports = (app) => {
   });
 
   // CREATE
-  app.post('/posts/new', (req, res) => {
-    // INSTANTIATE INSTANCE OF POST MODEL
-    const post = new Post(req.body);
-
-    // SAVE INSTANCE OF POST MODEL TO DB AND REDIRECT TO THE ROOT
-    post.save()
-      .then(() => {
-        res.redirect('/')
-      })
-      .catch(err => console.log(err))
-  });
+  app.post('/posts/new', async (req, res) => {
+    try {
+        const post = new Post(req.body);
+        await post.save();
+        res.redirect('/');
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Server error');
+    }
+});
 
   // SHOW
-  app.get('/posts/:id', (req, res) => {
-    Post.findById(req.params.id).lean()
-      .then((post) => res.render('posts-show', { post }))
-      .catch((err) => {
+  // Stretch Challenge - Async and Await
+  app.get('/posts/:id', async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id).lean();
+        return res.render('posts-show', { post });
+    } catch (err) {
         console.log(err.message);
-      });
-  });
+    }
+});
 };
