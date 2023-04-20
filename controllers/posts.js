@@ -19,25 +19,37 @@ module.exports = (app) => {
   });
 
   // CREATE
+  // Stretch Challenge - Async and Await
   app.post('/posts/new', async (req, res) => {
     try {
-        const post = new Post(req.body);
-        await post.save();
-        res.redirect('/');
+      const post = new Post(req.body);
+      await post.save();
+      res.redirect('/');
     } catch (err) {
-        console.log(err);
-        res.status(500).send('Server error');
+      console.log(err);
+      res.status(500).send('Server error');
     }
-});
+  });
 
   // SHOW
   // Stretch Challenge - Async and Await
   app.get('/posts/:id', async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).lean();
-        return res.render('posts-show', { post });
+      const post = await Post.findById(req.params.id).lean();
+      return res.render('posts-show', { post });
     } catch (err) {
-        console.log(err.message);
+      console.log(err.message);
     }
-});
+  });
+
+  // SUBREDDIT
+  // Stretch Challenge - Async and Await
+  app.get('/n/:subreddit', async (req, res) => {
+    try {
+      const posts = await Post.find({ subreddit: req.params.subreddit }).lean();
+      res.render('posts-index', { posts });
+    } catch (err) {
+      console.log(err);
+    }
+  });
 };
