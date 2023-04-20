@@ -35,7 +35,7 @@ module.exports = (app) => {
   // Stretch Challenge - Async and Await
   app.get('/posts/:id', async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id).lean();
+      const post = await Post.findById(req.params.id).lean().populate('comments');
       return res.render('posts-show', { post });
     } catch (err) {
       console.log(err.message);
