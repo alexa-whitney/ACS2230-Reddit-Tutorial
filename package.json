@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --exit",
     "start": "node server.js"
   },
   "author": "",
@@ -12,9 +12,14 @@
   "dependencies": {
     "express": "^4.18.2",
     "express-handlebars": "^7.0.4",
-    "handlebars": "^4.7.7",
-    "nodemon": "^2.0.22",
     "express-validator": "^6.15.0",
-    "mongoose": "^7.0.3"
+    "handlebars": "^4.7.7",
+    "mongoose": "^7.0.3",
+    "nodemon": "^2.0.22"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
+    "mocha": "^10.2.0"
   }
 }
