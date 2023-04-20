@@ -29,9 +29,14 @@ app.get('/', (req, res) => {
     res.render('home');
 });
 
-// Render the form
+// Render the new post form
 app.get('/posts/new', (req, res) => {
     res.render('posts-new');
+});
+
+// Render the login form
+app.get('/login', (req, res) => {
+    res.render('login');
 });
 
 app.listen(4000);
