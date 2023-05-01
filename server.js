@@ -4,6 +4,7 @@ const express = require('express');
 const handlebars = require('express-handlebars');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const checkAuth = require('./middleware/checkAuth');
 
 // Setup App
 const app = express();
@@ -16,6 +17,7 @@ app.set('view engine', 'handlebars');
 app.set('views', './views');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(checkAuth);
 
 // Setup DB
 require('./data/reddit-db');
