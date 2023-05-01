@@ -61,10 +61,9 @@ const checkAuth = (req, res, next) => {
   // Stretch Challenge - Async and Await
   app.get('/posts/:id', async (req, res) => {
     const currentUser = req.user;
-
     try {
-      const post = await Post.findById(req.params.id).lean().populate({ path:'comments', populate: { path: 'author' } }).populate('author')
-      return res.render('posts-show', { post, currentUser });
+      const post = await Post.findById(req.params.id).populate('comments').lean();
+      res.render('posts-show', { post, currentUser });
     } catch (err) {
       console.log(err.message);
     }
@@ -73,11 +72,10 @@ const checkAuth = (req, res, next) => {
   // SUBREDDIT
   // Stretch Challenge - Async and Await
   app.get('/n/:subreddit', async (req, res) => {
-    const currentUser = req.user;
-
+    const { user } = req;
     try {
-      const posts = await Post.find({ subreddit: req.params.subreddit }).lean().populate('author');
-      res.render('posts-index', { posts, currentUser });
+      const posts = await Post.find({ subreddit: req.params.subreddit }).lean();
+      res.render('posts-index', { posts, user });
     } catch (err) {
       console.log(err);
     }
