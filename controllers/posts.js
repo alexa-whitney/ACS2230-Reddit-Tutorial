@@ -1,4 +1,6 @@
 const Post = require('../models/post');
+const User = require('../models/user');
+const Comment = require('../models/comment');
 
 module.exports = (app) => {
 
@@ -14,13 +16,14 @@ const checkAuth = (req, res, next) => {
   // INDEX
   // Stretch Challenge - Async and Await
   app.get('/', async (req, res) => {
-    const currentUser = req.user;
-
     try {
-      const posts = await Post.find({}).lean();
-      return res.render('posts-index', { posts, currentUser });
+      const { user } = req;
+      console.log(req.cookies);
+      const posts = await Post.find({}).lean().populate('author');
+      res.render('posts-index', { posts, user });
     } catch (err) {
       console.log(err.message);
+      res.status(500).send('Server error');
     }
   });
 
@@ -31,18 +34,27 @@ const checkAuth = (req, res, next) => {
 
   // CREATE
   // Stretch Challenge - Async and Await
-  app.post('/posts/new', checkAuth, async (req, res) => {
+  app.post('/posts/new', async (req, res) => {
     if (req.user) {
-      const post = new Post(req.body);
-  
       try {
+        const userId = req.user._id;
+        const post = new Post(req.body);
+        post.author = userId;
         await post.save();
-        res.redirect('/');
+  
+        const user = await User.findById(userId);
+        user.posts.unshift(post);
+        await user.save();
+  
+        // REDIRECT TO THE NEW POST
+        return res.redirect(`/posts/${post._id}`);
       } catch (err) {
-        console.log(err);
+        console.log(err.message);
         res.status(500).send('Server error');
       }
-    } 
+    } else {
+      return res.status(401); // UNAUTHORIZED
+    }
   });
 
   // SHOW
@@ -51,7 +63,7 @@ const checkAuth = (req, res, next) => {
     const currentUser = req.user;
 
     try {
-      const post = await Post.findById(req.params.id).lean().populate('comments');
+      const post = await Post.findById(req.params.id).lean().populate('comments').populate('author');
       return res.render('posts-show', { post, currentUser });
     } catch (err) {
       console.log(err.message);
@@ -64,7 +76,7 @@ const checkAuth = (req, res, next) => {
     const currentUser = req.user;
 
     try {
-      const posts = await Post.find({ subreddit: req.params.subreddit }).lean();
+      const posts = await Post.find({ subreddit: req.params.subreddit }).lean().populate('author');
       res.render('posts-index', { posts, currentUser });
     } catch (err) {
       console.log(err);
