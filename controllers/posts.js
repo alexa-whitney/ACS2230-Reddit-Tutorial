@@ -5,13 +5,13 @@ const Comment = require('../models/comment');
 module.exports = (app) => {
 
   // Define checkAuth middleware
-const checkAuth = (req, res, next) => {
-  if (req.user) {
-    next();
-  } else {
-    return res.status(401).send('Unauthorized');
-  }
-};
+  const checkAuth = (req, res, next) => {
+    if (req.user) {
+      next();
+    } else {
+      return res.status(401).send('Unauthorized');
+    }
+  };
 
   // INDEX
   // Stretch Challenge - Async and Await
@@ -40,12 +40,15 @@ const checkAuth = (req, res, next) => {
         const userId = req.user._id;
         const post = new Post(req.body);
         post.author = userId;
+        post.upVotes = [];
+        post.downVotes = [];
+        post.voteScore = 0;
         await post.save();
-  
+
         const user = await User.findById(userId);
         user.posts.unshift(post);
         await user.save();
-  
+
         // REDIRECT TO THE NEW POST
         return res.redirect(`/posts/${post._id}`);
       } catch (err) {
@@ -76,6 +79,32 @@ const checkAuth = (req, res, next) => {
     try {
       const posts = await Post.find({ subreddit: req.params.subreddit }).lean();
       res.render('posts-index', { posts, user });
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
+  // VOTE-UP
+  app.put('/posts/:id/vote-up', async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id);
+      post.upVotes.push(req.user._id);
+      post.voteScore += 1;
+      await post.save();
+      return res.status(200);
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
+  // VOTE-DOWN
+  app.put('/posts/:id/vote-down', async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id);
+      post.downVotes.push(req.user._id);
+      post.voteScore -= 1;
+      await post.save();
+      return res.status(200);
     } catch (err) {
       console.log(err);
     }
